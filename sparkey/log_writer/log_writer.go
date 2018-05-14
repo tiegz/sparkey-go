@@ -6,6 +6,7 @@ package log_writer
 // #cgo LDFLAGS: -L/usr/local/lib -lsparkey
 // #include <./sparkey.h>
 import "C"
+import "unsafe"
 
 // TODO use iota instead?
 const COMPRESSION_NONE int  = 0
@@ -35,5 +36,24 @@ func (lw *LogWriter) Create() {
     C.CString(lw.Filename),
     C.sparkey_compression_type(lw.CompressionType),
     C.int(lw.BlockSize))
+}
+
+func (lw *LogWriter) Put(key string, value string) {
+  cKey := (*C.uchar)(unsafe.Pointer(C.CString(key)))
+  cValue := (*C.uchar)(unsafe.Pointer(C.CString(value)))
+
+  defer C.free(unsafe.Pointer(cKey))
+  defer C.free(unsafe.Pointer(cValue))
+
+  C.sparkey_logwriter_put(
+    lw.Instance,
+    C.ulonglong(len(key)),
+    cKey,
+    C.ulonglong(len(value)),
+    cValue)
+}
+
+func (lw *LogWriter) Flush() {
+  C.sparkey_logwriter_flush(lw.Instance)
 }
 

@@ -22,12 +22,11 @@ func New(filename string) *Sparkey {
 }
 
 func (store *Sparkey) Put(key string, value string) {
-  // TODO
-  // store.LogWriter.Put(key, value)
+  store.LogWriter.Put(key, value)
 }
 
 func (store *Sparkey) Flush() {
-  // TODO
+  store.LogWriter.Flush()
 }
 
 func (store *Sparkey) Size() (size int) {
