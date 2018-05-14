@@ -29,6 +29,10 @@ func (store *Sparkey) Flush() {
   store.LogWriter.Flush()
 }
 
+func (store *Sparkey) Delete(key string) {
+  store.LogWriter.Delete(key)
+}
+
 func (store *Sparkey) Size() (size int) {
   // TODO
   return 0

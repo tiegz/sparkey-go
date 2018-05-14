@@ -53,7 +53,15 @@ func (lw *LogWriter) Put(key string, value string) {
     cValue)
 }
 
+func (lw *LogWriter) Delete(key string) {
+  cKey := (*C.uchar)(unsafe.Pointer(C.CString(key)))
+
+  C.sparkey_logwriter_delete(
+    lw.Instance,
+    C.ulonglong((len(key))),
+    cKey)
+}
+
 func (lw *LogWriter) Flush() {
   C.sparkey_logwriter_flush(lw.Instance)
 }
-

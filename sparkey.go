@@ -11,6 +11,7 @@ func main () {
   s.Put("first", "Hello")
   s.Put("second", "Worlb")
   s.Put("third", "Goodbye")
+  s.Delete("third")
   s.Flush()
 
   fmt.Printf("Hello, Worlb. Sparkey info:\n  Filename: %d\n  LogWriter.Filename: %s\n  LogWriter.CompressionType: %s\n  LogWriter.BlockSize: %s\n  %s\n",
