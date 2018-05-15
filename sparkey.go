@@ -6,18 +6,23 @@ import (
 )
 
 func main () {
-  s := sparkey.New("sparkey_db.spl")
+  s := sparkey.New("sparkey_db")
 
-  s.Put("first", "Hello")
-  s.Put("second", "Worlb")
-  s.Put("third", "Goodbye")
-  s.Delete("third")
-  s.Flush()
+  // s.Put("first", "Hello")
+  // s.Put("second", "Worlb")
+  // s.Put("third", "Goodbye")
+  // s.Delete("third")
+  // s.Flush()
 
-  fmt.Printf("Hello, Worlb. Sparkey info:\n  Filename: %d\n  LogWriter.Filename: %s\n  LogWriter.CompressionType: %s\n  LogWriter.BlockSize: %s\n  %s\n",
-    s.Size(),
-    s.Filename,
-    s.LogWriter.Filename,
-    s.LogWriter.CompressionType,
-    s.LogWriter.BlockSize)
+  // s.GetAll()
+
+  fmt.Printf("Hello, Worlb. Sparkey info:\n  Basename: %d\n", s.Basename)
+    //\n  LogWriter.Basename: %s\n  LogWriter.CompressionType: %s\n  LogWriter.BlockSize: %s\n  %s\n",
+  //   s.Size(),
+  //   s.Basename,
+  //   s.LogWriter.Basename,
+  //   s.LogWriter.CompressionType,
+  //   s.LogWriter.BlockSize)
+
+  s.Close()
 }
