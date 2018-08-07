@@ -7,25 +7,8 @@ package sparkey
 // #include <./sparkey.h>
 import "C"
 
-type LogIterator struct {
-  LogReaderInstance *C.sparkey_logreader
-  Instance *C.sparkey_logiter
+func NewLogIterator(lr *C.sparkey_logreader) *C.sparkey_logiter {
+  var li *C.sparkey_logiter
+  C.sparkey_logiter_create(&li, lr)
+  return li
 }
-
-// TODO
-// func New(lri *C.sparkey_logreader) *LogIterator {
-//   li := LogIterator{
-//     LogReaderInstance: lri,
-//     Instance: nil,
-//   }
-//   li.Create()
-//   return &li
-// }
-
-// TODO
-//  // * sparkey_returncode returncode = sparkey_logiter_create(&myiter, myreader);
-// func (li *LogIterator) Create() {
-//   C.sparkey_logiter_create(
-//     &li.Instance,
-//     C.sparkey_logreader(&li.LogReaderInstance))
-// }

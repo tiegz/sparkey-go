@@ -6,23 +6,27 @@ import (
 )
 
 func main () {
-  s := sparkey.New("sparkey_db")
+  s := sparkey.New("sparkey_db", sparkey.COMPRESSION_NONE, 1024)
 
-  // s.Put("first", "Hello")
-  // s.Put("second", "Worlb")
-  // s.Put("third", "Goodbye")
-  // s.Delete("third")
-  // s.Flush()
+  s.Put("first", "Hello")
+  s.Put("second", "Worlb")
+  s.Put("third", "Goodbye")
+  s.Put("fourth", "EOM")
+  s.Delete("third")
+  s.Flush()
 
-  // s.GetAll()
+  fmt.Println("\n{")
+  s.ForEach(func(k, v string) {
+    fmt.Printf("  %s => %s\n", k, v)
+  })
+  fmt.Println("}\n")
 
-  fmt.Printf("Hello, Worlb. Sparkey info:\n  Basename: %d\n", s.Basename)
-    //\n  LogWriter.Basename: %s\n  LogWriter.CompressionType: %s\n  LogWriter.BlockSize: %s\n  %s\n",
-  //   s.Size(),
-  //   s.Basename,
-  //   s.LogWriter.Basename,
-  //   s.LogWriter.CompressionType,
-  //   s.LogWriter.BlockSize)
+
+  fmt.Printf("Sparkey info:\n\n")
+  fmt.Printf("  Basename:                  %s\n", s.Basename)
+  fmt.Printf("  Size:                      %d\n", s.Size())
+  fmt.Printf("  LogWriter.CompressionType: %d\n", s.CompressionType)
+  fmt.Printf("  LogWriter.BlockSize:       %d\n", s.BlockSize)
 
   s.Close()
 }
