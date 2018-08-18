@@ -36,11 +36,24 @@ func New(basename string, compression_type int, block_size int) *Sparkey {
     CompressionType: compression_type,
     BlockSize: block_size,
     LogWriter: NewLogWriter(basename, compression_type, 1024),
-    LogReader: NewLogReader(basename),
+    LogReader: OpenLogReader(basename),
     // LogIterator: NewLogIterator(???)
     HashWriter: NewHashWriter(basename),
-    HashReader: NewHashReader(basename),
+    HashReader: OpenHashReader(basename),
   }
+  return &s
+}
+
+func Open(basename string) *Sparkey {
+  s := Sparkey{
+    Basename: basename,
+    LogWriter: OpenLogWriter(basename),
+    LogReader: OpenLogReader(basename),
+    // LogIterator: NewLogIterator(???)
+    HashWriter: NewHashWriter(basename),
+    HashReader: OpenHashReader(basename),
+  }
+
   return &s
 }
 
@@ -58,16 +71,18 @@ func (store *Sparkey) Put(key string, value string) {
     C.ulonglong(len(value)),
     cValue)
 
-  fmt.Printf("Put: %s %d %s %d, Return Code: %d\n", key, len(key), value, len(value), return_code)
+  fmt.Printf("Put:\t\t%s %d %s %d, Return Code: %d\n", key, len(key), value, len(value), return_code)
 }
 
 func (store *Sparkey) Delete(key string) {
   cKey := (*C.uchar)(unsafe.Pointer(C.CString(key)))
 
-  C.sparkey_logwriter_delete(
+  return_code := C.sparkey_logwriter_delete(
     store.LogWriter,
     C.ulonglong((len(key))),
     cKey)
+
+  fmt.Printf("Delete:\t\t%s %d, Return Code: %d\n", key, len(key), return_code)
 }
 
 func (store *Sparkey) Flush() {
@@ -77,18 +92,18 @@ func (store *Sparkey) Flush() {
 
   // Flush logwriter
   return_code := C.sparkey_logwriter_flush(store.LogWriter)
-  fmt.Printf("Flush logwriter, Return Code %d\n", return_code)
+  fmt.Printf("Flush logwriter\t\tReturn Code %d\n", return_code)
 
   // Reset to flush cached headers
   return_code = C.sparkey_logreader_open(&store.LogReader, C.CString(log_filename))
-  fmt.Printf("Flush logreader, Return Code %d\n", return_code)
+  fmt.Printf("Flush logreader\t\tReturn Code %d\n", return_code)
 
   return_code = C.sparkey_hash_write(C.CString(index_filename), C.CString(log_filename), 0)
-  fmt.Printf("Hash write, Return Code %d\n", return_code)
+  fmt.Printf("Hash write\t\tReturn Code %d\n", return_code)
 
   // TODO do we really  need to reopen hash reader?
   return_code = C.sparkey_hash_open(&store.HashReader, C.CString(index_filename), C.CString(log_filename))
-  fmt.Printf("Hash open, Return Code %d\n", return_code)
+  fmt.Printf("Hash open\t\tReturn Code %d\n", return_code)
 }
 
 
@@ -157,6 +172,14 @@ func (store *Sparkey) ForEach(fn func(k, v string)) {
   }
 
   C.sparkey_logiter_close(&li)
+}
+
+func (store *Sparkey) PrettyPrint() {
+  fmt.Println("\n{")
+  store.ForEach(func(k, v string) {
+    fmt.Printf("  %s => %s\n", k, v)
+  })
+  fmt.Println("}\n")
 }
 
 func (store *Sparkey) GetAll() {

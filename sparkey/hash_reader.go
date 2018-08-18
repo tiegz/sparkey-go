@@ -8,7 +8,7 @@ package sparkey
 import "C"
 import "fmt"
 
-func NewHashReader(basename string) *C.sparkey_hashreader {
+func OpenHashReader(basename string) *C.sparkey_hashreader {
   var hr *C.sparkey_hashreader
   hash_filename := basename + ".spi"
   log_filename  := basename + ".spl"
@@ -17,7 +17,7 @@ func NewHashReader(basename string) *C.sparkey_hashreader {
     C.CString(hash_filename),
     C.CString(log_filename))
 
-  fmt.Printf("NewHashReader %s, %s, Return Code: %d\n", hash_filename, log_filename, return_code)
+  fmt.Printf("OpenHashReader\t\t%s, %s, Return Code: %d\n", hash_filename, log_filename, return_code)
 
   return hr
 }

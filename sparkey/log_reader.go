@@ -13,14 +13,14 @@ type LogReader struct {
   Instance *C.sparkey_logreader
 }
 
-func NewLogReader(basename string) *C.sparkey_logreader {
+func OpenLogReader(basename string) *C.sparkey_logreader {
   var lr *C.sparkey_logreader
   filename    := basename + ".spl"
   return_code := C.sparkey_logreader_open(
     &lr,
     C.CString(filename))
 
-  fmt.Printf("NewLogReader: %s, Return Code: %d\n", filename, return_code)
+  fmt.Printf("OpenLogReader:\t\t%s, Return Code: %d\n", filename, return_code)
 
   return lr
 }

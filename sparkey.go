@@ -15,12 +15,11 @@ func main () {
   s.Delete("third")
   s.Flush()
 
-  fmt.Println("\n{")
-  s.ForEach(func(k, v string) {
-    fmt.Printf("  %s => %s\n", k, v)
-  })
-  fmt.Println("}\n")
+  // s.Get()
+  // s.GetAll()
+  // TODO fix Delete?
 
+  s.PrettyPrint();
 
   fmt.Printf("Sparkey info:\n\n")
   fmt.Printf("  Basename:                  %s\n", s.Basename)
@@ -29,4 +28,18 @@ func main () {
   fmt.Printf("  LogWriter.BlockSize:       %d\n", s.BlockSize)
 
   s.Close()
+
+  fmt.Println("\n\nReopening...")
+
+  s = sparkey.Open("sparkey_db")
+  s.PrettyPrint();
+
+  fmt.Printf("Sparkey info:\n\n")
+  fmt.Printf("  Basename:                  %s\n", s.Basename)
+  fmt.Printf("  Size:                      %d\n", s.Size())
+  fmt.Printf("  LogWriter.CompressionType: %d\n", s.CompressionType)
+  fmt.Printf("  LogWriter.BlockSize:       %d\n", s.BlockSize)
+
+  s.Close()
+
 }

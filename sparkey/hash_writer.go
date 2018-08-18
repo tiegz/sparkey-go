@@ -18,7 +18,8 @@ func NewHashWriter(basename string) *HashWriter {
     C.CString(hash_filename),
     C.CString(log_filename),
     0)
-  fmt.Printf("NewHashWriter: %s, %s, Return Code: %d\n", hash_filename, log_filename, return_code)
+  fmt.Printf("NewHashWriter:\t\t%s, %s, Return Code: %d\n", hash_filename, log_filename, return_code)
 
   return &hw
 }
+
