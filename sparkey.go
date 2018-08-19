@@ -19,7 +19,8 @@ func main () {
   // s.GetAll()
   // TODO fix Delete?
 
-  s.PrettyPrint();
+  s.PrettyPrintLog();
+  s.PrettyPrintHash();
 
   fmt.Printf("Sparkey info:\n\n")
   fmt.Printf("  Basename:                  %s\n", s.Basename)
@@ -28,18 +29,4 @@ func main () {
   fmt.Printf("  LogWriter.BlockSize:       %d\n", s.BlockSize)
 
   s.Close()
-
-  fmt.Println("\n\nReopening...")
-
-  s = sparkey.Open("sparkey_db")
-  s.PrettyPrint();
-
-  fmt.Printf("Sparkey info:\n\n")
-  fmt.Printf("  Basename:                  %s\n", s.Basename)
-  fmt.Printf("  Size:                      %d\n", s.Size())
-  fmt.Printf("  LogWriter.CompressionType: %d\n", s.CompressionType)
-  fmt.Printf("  LogWriter.BlockSize:       %d\n", s.BlockSize)
-
-  s.Close()
-
 }
