@@ -15,11 +15,11 @@ func main () {
   s.Delete("third")
   s.Flush()
 
-  // s.Get()
+  s.Get("first")
   // s.GetAll()
   // TODO fix Delete?
 
-  s.PrettyPrintLog();
+  // s.PrettyPrintLog();
   s.PrettyPrintHash();
 
   fmt.Printf("Sparkey info:\n\n")

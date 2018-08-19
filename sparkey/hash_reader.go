@@ -21,3 +21,4 @@ func OpenHashReader(basename string) *C.sparkey_hashreader {
 
   return hr
 }
+
