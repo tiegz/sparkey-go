@@ -119,66 +119,30 @@ func (store *Sparkey) Size() (size uint64) {
   return uint64(C.sparkey_hash_numentries(store.HashReader))
 }
 
+type forEachType uint
+const (
+  FOR_EACH_LOG forEachType = iota
+  FOR_EACH_HASH
+)
 
 func (store *Sparkey) ForEachHash(fn func(k, v string)) {
   var li *C.sparkey_logiter = NewLogIterator(store.LogReader)
-  var lis C.sparkey_iter_state = C.sparkey_logiter_state(li)
 
-  var wanted_keylen C.ulonglong
-  var actual_keylen C.ulonglong
-  var wanted_valuelen C.ulonglong
-  var actual_valuelen C.ulonglong
-  var keybuf *C.uchar
-  var valuebuf *C.uchar
-  var return_code C.sparkey_returncode
-  defer C.free(unsafe.Pointer(keybuf))
-  defer C.free(unsafe.Pointer(valuebuf))
-
-  for lis == ITERATOR_STATE_NEW || lis == ITERATOR_STATE_ACTIVE {
-    // TODO: check the returncode
-    C.sparkey_logiter_hashnext(li, store.HashReader);
-
-    wanted_keylen = C.sparkey_logiter_keylen(li)
-    keybuf = (*C.uchar)(unsafe.Pointer(C.CString("")))
-    return_code = C.sparkey_logiter_fill_key(li, store.LogReader, wanted_keylen, keybuf, &actual_keylen)
-    if return_code != C.SPARKEY_SUCCESS {
-      fmt.Printf("Breaking, sparkey_logiter_fill_key returned %d return code.", C.int(return_code))
-      break // TODO return error instead of breaking
-    }
-    if (wanted_keylen != actual_keylen) {
-      fmt.Printf("Breaking, sparkey_logiter_fill_key returned %d length instead of %d length.", C.int(actual_keylen), C.int(wanted_keylen))
-      break // TODO return error instead of breaking
-    }
-
-    wanted_valuelen = C.sparkey_logiter_valuelen(li)
-    valuebuf = (*C.uchar)(unsafe.Pointer(C.CString("")))
-    return_code = C.sparkey_logiter_fill_value(li, store.LogReader, wanted_valuelen, valuebuf, &actual_valuelen)
-    if return_code != C.SPARKEY_SUCCESS {
-      fmt.Printf("Breaking, sparkey_logiter_fill_value returned %d return code.", C.int(return_code))
-      break // TODO return error instead of breaking
-    }
-    if (wanted_keylen != actual_keylen) {
-      fmt.Printf("Breaking, sparkey_logiter_fill_value returned %d length instead of %d length.", C.int(actual_keylen), C.int(wanted_valuelen))
-      break // TODO return error instead of breaking
-    }
-
-    lis = C.sparkey_logiter_state(li)
-    if lis == ITERATOR_STATE_ACTIVE {
-      keybuf_value   := (*C.char)(unsafe.Pointer(keybuf))
-      valuebuf_value := (*C.char)(unsafe.Pointer(valuebuf))
-      fn(C.GoString(keybuf_value), C.GoString(valuebuf_value))
-    }
-
-    keybuf = nil
-    valuebuf = nil
-  }
+  store.forEach(FOR_EACH_HASH, li, fn)
 
   C.sparkey_logiter_close(&li)
 }
 
-//func (t *Immutable) ForEach(fn func(k, v []byte) bool) {
 func (store *Sparkey) ForEachLog(fn func(k, v string)) {
   var li *C.sparkey_logiter = NewLogIterator(store.LogReader)
+
+  store.forEach(FOR_EACH_LOG, li, fn)
+
+  C.sparkey_logiter_close(&li)
+}
+
+
+func (store *Sparkey) forEach(t forEachType, li *C.sparkey_logiter, fn func(k, v string)) {
   var lis C.sparkey_iter_state = C.sparkey_logiter_state(li)
 
   var wanted_keylen C.ulonglong
@@ -193,7 +157,12 @@ func (store *Sparkey) ForEachLog(fn func(k, v string)) {
 
   for lis == ITERATOR_STATE_NEW || lis == ITERATOR_STATE_ACTIVE {
     // TODO: check the returncode
-    C.sparkey_logiter_next(li, store.LogReader);
+    switch t {
+    case FOR_EACH_HASH:
+      C.sparkey_logiter_hashnext(li, store.HashReader);
+    case FOR_EACH_LOG:
+      C.sparkey_logiter_next(li, store.LogReader);
+    }
 
     wanted_keylen = C.sparkey_logiter_keylen(li)
     keybuf = (*C.uchar)(unsafe.Pointer(C.CString("")))
@@ -229,8 +198,6 @@ func (store *Sparkey) ForEachLog(fn func(k, v string)) {
     keybuf = nil
     valuebuf = nil
   }
-
-  C.sparkey_logiter_close(&li)
 }
 
 func (store *Sparkey) PrettyPrintHash() {
