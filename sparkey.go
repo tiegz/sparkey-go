@@ -23,10 +23,13 @@ func main () {
   s.PrettyPrintHash();
 
   fmt.Printf("Sparkey info:\n\n")
-  fmt.Printf("  Basename:                  %s\n", s.Basename)
-  fmt.Printf("  Size:                      %d\n", s.Size())
-  fmt.Printf("  LogWriter.CompressionType: %d\n", s.CompressionType)
-  fmt.Printf("  LogWriter.BlockSize:       %d\n", s.BlockSize)
+  fmt.Printf("  Basename:\t\t%s\n", s.Basename)
+  fmt.Printf("  CompressionType:\t\t%d\n", s.CompressionType)
+  fmt.Printf("  Size:\t\t%d\n", s.Size())
+  fmt.Printf("  LogWriter.CompressionType:\t\t%d\n", s.CompressionType)
+  fmt.Printf("  LogWriter.BlockSize:\t\t%d\n", s.BlockSize)
+  fmt.Printf("  MaxKeyLen:\t\t%d\n", s.MaxKeyLen)
+  fmt.Printf("  MaxValueLen:\t\t%d\n", s.MaxValueLen)
 
   s.Close()
 }

@@ -253,6 +253,16 @@ func (store *Sparkey) forEach(t forEachType, li *C.sparkey_logiter, fn func(k, v
   }
 }
 
+func (store *Sparkey) MaxKeyLen() (l C.ulonglong) {
+  C.sparkey_logreader_maxkeylen(store.LogReader)
+  return l
+}
+
+func (store *Sparkey) MaxValueLen() (l C.ulonglong) {
+  l = C.sparkey_logreader_maxvaluelen(store.LogReader)
+  return l
+}
+
 func (store *Sparkey) PrettyPrintHash() {
   fmt.Println("\n{")
   store.ForEachHash(func(k, v string) {
