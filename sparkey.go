@@ -15,6 +15,7 @@ func main () {
   s.Delete("third")
   s.Flush()
 
+
   s.Get("first")
   // s.GetAll()
   // TODO fix Delete?

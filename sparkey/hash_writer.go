@@ -10,15 +10,13 @@ import "fmt"
 
 type HashWriter struct {}
 
-func NewHashWriter(basename string) *HashWriter {
+func NewHashWriter(log_filename string, index_filename string) *HashWriter {
   hw := HashWriter{}
-  hash_filename := basename + ".spi"
-  log_filename  := basename + ".spl"
   return_code   := C.sparkey_hash_write(
-    C.CString(hash_filename),
+    C.CString(index_filename),
     C.CString(log_filename),
     0)
-  fmt.Printf("NewHashWriter:\t\t%s, %s, Return Code: %d\n", hash_filename, log_filename, return_code)
+  fmt.Printf("NewHashWriter:\t\t%s, %s, Return Code: %d\n", log_filename, index_filename, return_code)
 
   return &hw
 }

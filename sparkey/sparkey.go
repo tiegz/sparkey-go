@@ -9,26 +9,19 @@ import "C"
 import "unsafe"
 import "fmt"
 
-type Sparkey struct {
-  Basename string
-  CompressionType int
-  BlockSize int
-  LogWriter   *C.sparkey_logwriter
-  LogReader   *C.sparkey_logreader
-  // LogIterator *C.sparkey_logiter
-  HashWriter  *HashWriter // there's actually no HashWriter struct in Sparkey's C API -- HashWriter is unused except for the factory method
-  HashReader  *C.sparkey_hashreader
-}
 
-// TODO use iota instead?
-const COMPRESSION_NONE int   = 0
-const COMPRESSION_SNAPPY int = 1
+type compressionType int
+const (
+  COMPRESSION_NONE compressionType = iota
+  COMPRESSION_SNAPPY
+)
 
-// TODO use iota instead?
-const ITERATOR_STATE_NEW C.sparkey_iter_state = 0
-const ITERATOR_STATE_ACTIVE C.sparkey_iter_state = 1
-const ITERATOR_STATE_CLOSED C.sparkey_iter_state = 2
-const ITERATOR_STATE_INVALID C.sparkey_iter_state = 3
+const (
+  ITERATOR_STATE_NEW     = 0
+  ITERATOR_STATE_ACTIVE  = 1
+  ITERATOR_STATE_CLOSED  = 2
+  ITERATOR_STATE_INVALID = 3
+)
 
 type forEachType uint
 const (
@@ -36,30 +29,49 @@ const (
   FOR_EACH_HASH
 )
 
-func New(basename string, compression_type int, block_size int) *Sparkey {
+type Sparkey struct {
+  Basename string
+  LogFilename string
+  IndexFilename string
+  CompressionType compressionType
+  BlockSize int
+  LogWriter   *C.sparkey_logwriter
+  LogReader   *C.sparkey_logreader
+  HashWriter  *HashWriter // there's actually no HashWriter struct in Sparkey's C API -- HashWriter is unused except for the factory method
+  HashReader  *C.sparkey_hashreader
+}
+
+func New(basename string, compression_type compressionType, block_size int) *Sparkey {
+  log_filename := basename + ".spl"
+  index_filename := basename + ".spi"
+
   s := Sparkey{
     Basename: basename,
+    LogFilename: log_filename,
+    IndexFilename: index_filename,
     CompressionType: compression_type,
     BlockSize: block_size,
-    LogWriter: NewLogWriter(basename, compression_type, 1024),
-    LogReader: OpenLogReader(basename),
-    // LogIterator: NewLogIterator(???),
-    // HashIterator: NewHashIterator(???),
-    HashWriter: NewHashWriter(basename),
-    HashReader: OpenHashReader(basename),
+    LogWriter: NewLogWriter(log_filename, compression_type, 1024),
+    LogReader: OpenLogReader(log_filename),
+    HashWriter: NewHashWriter(log_filename, index_filename),
+    HashReader: OpenHashReader(log_filename, index_filename),
   }
+
   return &s
 }
 
 func Open(basename string) *Sparkey {
+  log_filename := basename + ".spl"
+  index_filename := basename + ".spi"
+
   s := Sparkey{
     Basename: basename,
-    LogWriter: OpenLogWriter(basename),
-    LogReader: OpenLogReader(basename),
-    // LogIterator: NewLogIterator(???),
-    // HashIterator: NewHashIterator(???),
-    HashWriter: NewHashWriter(basename),
-    HashReader: OpenHashReader(basename),
+    LogFilename: log_filename,
+    IndexFilename: index_filename,
+    LogWriter: OpenLogWriter(log_filename),
+    LogReader: OpenLogReader(log_filename),
+    HashWriter: NewHashWriter(log_filename, index_filename),
+    HashReader: OpenHashReader(log_filename, index_filename),
   }
 
   return &s
@@ -94,23 +106,19 @@ func (store *Sparkey) Delete(key string) {
 }
 
 func (store *Sparkey) Flush() {
-  // TODO could we store these in store instead of building them?
-  log_filename := store.Basename + ".spl"
-  index_filename := store.Basename + ".spi"
-
   // Flush logwriter
   return_code := C.sparkey_logwriter_flush(store.LogWriter)
   fmt.Printf("Flush LW:\t\tReturn Code %d\n", return_code)
 
   // Reset to flush cached headers
-  return_code = C.sparkey_logreader_open(&store.LogReader, C.CString(log_filename))
+  return_code = C.sparkey_logreader_open(&store.LogReader, C.CString(store.LogFilename))
   fmt.Printf("Flush LR:\t\tReturn Code %d\n", return_code)
 
-  return_code = C.sparkey_hash_write(C.CString(index_filename), C.CString(log_filename), 0)
+  return_code = C.sparkey_hash_write(C.CString(store.IndexFilename), C.CString(store.LogFilename), 0)
   fmt.Printf("Hash write:\t\tReturn Code %d\n", return_code)
 
   // TODO do we really  need to reopen hash reader?
-  return_code = C.sparkey_hash_open(&store.HashReader, C.CString(index_filename), C.CString(log_filename))
+  return_code = C.sparkey_hash_open(&store.HashReader, C.CString(store.IndexFilename), C.CString(store.LogFilename))
   fmt.Printf("Hash open:\t\tReturn Code %d\n", return_code)
 }
 
@@ -253,13 +261,13 @@ func (store *Sparkey) forEach(t forEachType, li *C.sparkey_logiter, fn func(k, v
   }
 }
 
-func (store *Sparkey) MaxKeyLen() (l C.ulonglong) {
-  C.sparkey_logreader_maxkeylen(store.LogReader)
+func (store *Sparkey) MaxKeyLen() (l uint64) {
+  l = uint64(C.sparkey_logreader_maxkeylen(store.LogReader))
   return l
 }
 
-func (store *Sparkey) MaxValueLen() (l C.ulonglong) {
-  l = C.sparkey_logreader_maxvaluelen(store.LogReader)
+func (store *Sparkey) MaxValueLen() (l uint64) {
+  l = uint64(C.sparkey_logreader_maxvaluelen(store.LogReader))
   return l
 }
 
