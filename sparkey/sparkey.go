@@ -9,6 +9,7 @@ import "C"
 import "unsafe"
 import "fmt"
 
+const DEFAULT_BLOCK_SIZE uint = 1024
 
 type compressionType int
 const (
@@ -84,42 +85,34 @@ func (store *Sparkey) Put(key string, value string) {
   defer C.free(unsafe.Pointer(cKey))
   defer C.free(unsafe.Pointer(cValue))
 
-  return_code := C.sparkey_logwriter_put(
+  C.sparkey_logwriter_put(
     store.LogWriter,
     C.ulonglong(len(key)),
     cKey,
     C.ulonglong(len(value)),
     cValue)
-
-  fmt.Printf("Put:\t\t\t%s %d %s %d, Return Code: %d\n", key, len(key), value, len(value), return_code)
 }
 
 func (store *Sparkey) Delete(key string) {
   cKey := (*C.uchar)(unsafe.Pointer(C.CString(key)))
 
-  return_code := C.sparkey_logwriter_delete(
+  C.sparkey_logwriter_delete(
     store.LogWriter,
     C.ulonglong((len(key))),
     cKey)
-
-  fmt.Printf("Delete:\t\t\t%s %d, Return Code: %d\n", key, len(key), return_code)
 }
 
 func (store *Sparkey) Flush() {
   // Flush logwriter
-  return_code := C.sparkey_logwriter_flush(store.LogWriter)
-  fmt.Printf("Flush LW:\t\tReturn Code %d\n", return_code)
+  C.sparkey_logwriter_flush(store.LogWriter)
 
   // Reset to flush cached headers
-  return_code = C.sparkey_logreader_open(&store.LogReader, C.CString(store.LogFilename))
-  fmt.Printf("Flush LR:\t\tReturn Code %d\n", return_code)
+  C.sparkey_logreader_open(&store.LogReader, C.CString(store.LogFilename))
 
-  return_code = C.sparkey_hash_write(C.CString(store.IndexFilename), C.CString(store.LogFilename), 0)
-  fmt.Printf("Hash write:\t\tReturn Code %d\n", return_code)
+  C.sparkey_hash_write(C.CString(store.IndexFilename), C.CString(store.LogFilename), 0)
 
   // TODO do we really  need to reopen hash reader?
-  return_code = C.sparkey_hash_open(&store.HashReader, C.CString(store.IndexFilename), C.CString(store.LogFilename))
-  fmt.Printf("Hash open:\t\tReturn Code %d\n", return_code)
+  C.sparkey_hash_open(&store.HashReader, C.CString(store.IndexFilename), C.CString(store.LogFilename))
 }
 
 
@@ -145,7 +138,7 @@ func (store *Sparkey) Get(k string) (v string) {
   var return_code C.sparkey_returncode
 
   // TODO handle return code
-  return_code = C.sparkey_hash_get(
+  C.sparkey_hash_get(
     store.HashReader,
     cKey,
     C.ulonglong(len(k)),
@@ -176,8 +169,6 @@ func (store *Sparkey) Get(k string) (v string) {
     valuebuf_value := (*C.char)(unsafe.Pointer(valuebuf))
     v = C.GoString(valuebuf_value)
   }
-
-  fmt.Printf("Get:\t\t%s %s, Return Code: %d\n", k, v, return_code)
 
   return v
 }
@@ -276,7 +267,7 @@ func (store *Sparkey) PrettyPrintHash() {
   store.ForEachHash(func(k, v string) {
     fmt.Printf("  %s => %s\n", k, v)
   })
-  fmt.Println("}\n")
+  fmt.Println("}")
 }
 
 func (store *Sparkey) PrettyPrintLog() {
@@ -284,7 +275,7 @@ func (store *Sparkey) PrettyPrintLog() {
   store.ForEachLog(func(k, v string) {
     fmt.Printf("  %s => %s\n", k, v)
   })
-  fmt.Println("}\n")
+  fmt.Println("}")
 }
 
 func (store *Sparkey) GetAll() {

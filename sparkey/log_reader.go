@@ -6,15 +6,12 @@ package sparkey
 // #cgo LDFLAGS: -L/usr/local/lib -lsparkey
 // #include <./sparkey.h>
 import "C"
-import "fmt"
 
 func OpenLogReader(log_filename string) *C.sparkey_logreader {
   var lr *C.sparkey_logreader
-  return_code := C.sparkey_logreader_open(
+  C.sparkey_logreader_open(
     &lr,
     C.CString(log_filename))
-
-  fmt.Printf("OpenLogReader:\t\t%s, Return Code: %d\n", log_filename, return_code)
 
   return lr
 }
