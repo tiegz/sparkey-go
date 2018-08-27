@@ -102,3 +102,17 @@ s.Close()
 //   MaxKeyLen:    6
 //   MaxValueLen:    7
 ```
+
+### Running Tests
+
+```
+cd sparkey
+go test -v .
+```
+
+### Running Benches
+
+```
+cd sparkey
+go test -bench=. -v
+```
