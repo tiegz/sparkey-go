@@ -6,8 +6,11 @@ package sparkey
 // #cgo LDFLAGS: -L/usr/local/lib -lsparkey
 // #include <./sparkey.h>
 import "C"
-import "unsafe"
-import "fmt"
+import (
+  "unsafe"
+  "fmt"
+  "os"
+)
 
 const DEFAULT_BLOCK_SIZE uint = 1024
 
@@ -125,6 +128,18 @@ func (store *Sparkey) Close() {
   C.sparkey_logwriter_close(&store.LogWriter)
   C.sparkey_logreader_close(&store.LogReader)
   C.sparkey_hash_close(&store.HashReader)
+}
+
+// Removes the Sparkey datastore files.
+// TODO handle errors
+func (store *Sparkey) DeleteSparkey() {
+  if err := os.Remove(store.LogFilename); err != nil {
+    fmt.Printf(err.Error())
+  }
+
+  if err := os.Remove(store.IndexFilename); err != nil {
+    fmt.Printf(err.Error())
+  }
 }
 
 func (store *Sparkey) Size() (size uint64) {

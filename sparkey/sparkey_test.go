@@ -2,8 +2,8 @@ package sparkey
 
 import (
   "testing"
-  "os"
   "fmt"
+  "os"
 )
 
 func TestNew(t *testing.T) {
@@ -16,8 +16,8 @@ func TestNew(t *testing.T) {
   s1.Close()
   s2.Close()
 
-  cleanupSparkeyFiles(s1)
-  cleanupSparkeyFiles(s2)
+  s1.DeleteSparkey()
+  s2.DeleteSparkey()
 }
 
 func TestOpen(t *testing.T) {
@@ -30,7 +30,7 @@ func TestOpen(t *testing.T) {
   assertSparkeyExists(t, "my-first-sparkey")
   assertSparkeyKeyValue(t, s, "first key", "first value")
 
-  cleanupSparkeyFiles(s)
+  s.DeleteSparkey()
 }
 
 func TestPut(t *testing.T) {
@@ -52,8 +52,7 @@ func TestPut(t *testing.T) {
   assertSparkeyKeyValue(t, s, "third key", "third value")
 
   s.Close()
-
-  cleanupSparkeyFiles(s)
+  s.DeleteSparkey()
 }
 
 func TestGet(t *testing.T) {
@@ -68,8 +67,7 @@ func TestGet(t *testing.T) {
   }
 
   s.Close()
-
-  cleanupSparkeyFiles(s)
+  s.DeleteSparkey()
 }
 
 
@@ -83,8 +81,7 @@ func TestDelete(t *testing.T) {
   assertSparkeyNilValue(t, s, "first key")
 
   s.Close()
-
-  cleanupSparkeyFiles(s)
+  s.DeleteSparkey()
 }
 
 func assertSparkeyNilValue(t *testing.T, s *Sparkey, k string) {
@@ -114,12 +111,3 @@ func assertSparkeyExists(t *testing.T, basename string) {
   }
 }
 
-func cleanupSparkeyFiles(s *Sparkey) {
-  if err := os.Remove(s.LogFilename); err != nil {
-    fmt.Printf(err.Error())
-  }
-
-  if err := os.Remove(s.IndexFilename); err != nil {
-    fmt.Printf(err.Error())
-  }
-}
