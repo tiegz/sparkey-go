@@ -4,7 +4,9 @@
 
 [`sparkey`](https://github.com/spotify/sparkey) is a disk-based hash table, optimized for bulk writes and fast reads.
 
-[`sparkey`](https://github.com/spotify/sparkey) writes two files to disk, for its use: a log file (e.g. "blargh.spl"), and an index file (e.g. "blargh.spi").
+[`sparkey`](https://github.com/spotify/sparkey) keeps two files on disk: a log file (e.g. "blargh.spl"), and an index file (e.g. "blargh.spi").
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/tiegz/sparkey-go)](https://goreportcard.com/report/github.com/tiegz/sparkey-go)
 
 ## Setup
 
@@ -13,11 +15,22 @@ First install the `sparkey` library:
 * in OSX: `brew install sparkey`
 * in Unix: [build from source](https://github.com/spotify/sparkey#building)
 
-For now, `sparkey-go` uses `go dep`. Add it to your project:
+
+### Install manually
+
+`go get github.com/tiegz/sparkey-go`
+
+### Install with go dep
 
 `dep ensure -add github.com/tiegz/sparkey-go`
 
 ## Usage
+
+#### Importing it
+
+``` go
+import "github.com/tiegz/sparkey-go"
+```
 
 #### Creating the store
 
@@ -62,7 +75,7 @@ s.ForEachHash(func(k, v string) {
 // fourth: EOM
 ```
 
-#### Inspecting the store
+#### Pretty-printing the store
 
 ``` go
 s.PrettyPrintHash();
@@ -111,6 +124,3 @@ go test -v .
 cd sparkey
 go test -bench=. -v
 ```
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/tiegz/sparkey-go)](https://goreportcard.com/report/github.com/tiegz/sparkey-go)
-
