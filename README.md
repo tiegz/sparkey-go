@@ -1,8 +1,10 @@
 # Sparkey in Go
 
-`sparkey-go` is [cgo](https://golang.org/cmd/cgo/) bindings around the `sparkey` library. `sparkey` is a disk-based hash table, optimized for bulk writes and fast reads.
+`sparkey-go` is [cgo](https://golang.org/cmd/cgo/) bindings around the [`sparkey`](https://github.com/spotify/sparkey) library.
 
-`sparkey` writes two files to disk, for its use: a log file (e.g. "blargh.spl"), and an index file (e.g. "blargh.spi").
+[`sparkey`](https://github.com/spotify/sparkey) is a disk-based hash table, optimized for bulk writes and fast reads.
+
+[`sparkey`](https://github.com/spotify/sparkey) writes two files to disk, for its use: a log file (e.g. "blargh.spl"), and an index file (e.g. "blargh.spi").
 
 ## Setup
 
