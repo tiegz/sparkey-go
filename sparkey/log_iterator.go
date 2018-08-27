@@ -8,7 +8,7 @@ package sparkey
 import "C"
 
 func NewLogIterator(lr *C.sparkey_logreader) *C.sparkey_logiter {
-  var li *C.sparkey_logiter
-  C.sparkey_logiter_create(&li, lr)
-  return li
+	var li *C.sparkey_logiter
+	C.sparkey_logiter_create(&li, lr)
+	return li
 }

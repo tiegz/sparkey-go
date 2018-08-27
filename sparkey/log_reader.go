@@ -8,10 +8,10 @@ package sparkey
 import "C"
 
 func OpenLogReader(log_filename string) *C.sparkey_logreader {
-  var lr *C.sparkey_logreader
-  C.sparkey_logreader_open(
-    &lr,
-    C.CString(log_filename))
+	var lr *C.sparkey_logreader
+	C.sparkey_logreader_open(
+		&lr,
+		C.CString(log_filename))
 
-  return lr
+	return lr
 }
