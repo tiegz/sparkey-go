@@ -1,24 +1,21 @@
-### sparkey-go - Sparkey in Go
+# Sparkey in Go
 
-`sparkey-go` is a [cgo](https://golang.org/cmd/cgo/) binding around the `sparkey` library. `sparkey` is a disk-based hash table.
+`sparkey-go` is [cgo](https://golang.org/cmd/cgo/) bindings around the `sparkey` library. `sparkey` is a disk-based hash table, optimized for bulk writes and fast reads.
 
 `sparkey` writes two files to disk, for its use: a log file (e.g. "blargh.spl"), and an index file (e.g. "blargh.spi").
 
-### Install
+## Setup
 
 First install the `sparkey` library:
 
-#### OSX
+* in OSX: `brew install sparkey`
+* in Unix: [build from source](https://github.com/spotify/sparkey#building)
 
-`brew install sparkey`
-
-#### Unix
-
-For now, `sparkey-go` uses `go dep`:
+For now, `sparkey-go` uses `go dep`. Add it to your project:
 
 `dep ensure -add github.com/tiegz/sparkey-go`
 
-### Example
+## Usage
 
 #### Creating the store
 
@@ -112,3 +109,6 @@ go test -v .
 cd sparkey
 go test -bench=. -v
 ```
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/tiegz/sparkey-go)](https://goreportcard.com/report/github.com/tiegz/sparkey-go)
+
