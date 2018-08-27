@@ -2,7 +2,7 @@
 
 `sparkey-go` is a [cgo](https://golang.org/cmd/cgo/) binding around the `sparkey` library. `sparkey` is a disk-based hash table.
 
-`sparkey` writes two files to disk, for its use: a log file, and an index file. (e.g. "blargh.spl" and "blargh.spi")
+`sparkey` writes two files to disk, for its use: a log file (e.g. "blargh.spl"), and an index file (e.g. "blargh.spi").
 
 ### Install
 
@@ -13,8 +13,6 @@ First install the `sparkey` library:
 `brew install sparkey`
 
 #### Unix
-
-``
 
 For now, `sparkey-go` uses `go dep`:
 
@@ -63,7 +61,6 @@ s.ForEachHash(func(k, v string) {
 // first: Hello
 // second: Worlb
 // fourth: EOM
-// }
 ```
 
 #### Inspecting the store
@@ -90,7 +87,6 @@ fmt.Printf("  LogWriter.BlockSize:\t\t%d\n", s.BlockSize)
 fmt.Printf("  MaxKeyLen:\t\t%d\n", s.MaxKeyLen())
 fmt.Printf("  MaxValueLen:\t\t%d\n", s.MaxValueLen())
 s.Close()
-
 
 // Sparkey info:
 //
